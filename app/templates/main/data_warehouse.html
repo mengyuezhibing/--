@@ -1,0 +1,216 @@
+{% extends "base.html" %}
+
+{% block page_title %}数据仓库{% endblock %}
+
+{% block content %}
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">数据搜索</h5>
+    </div>
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('main.search_data') }}">
+            <div class="input-group">
+                <input 
+                    type="text" 
+                    class="form-control form-control-lg" 
+                    name="search_keyword" 
+                    placeholder="搜索数据..."
+                    value="{{ search_keyword }}"
+                >
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="bi bi-search"></i>
+                </button>
+                {% if search_keyword %}
+                <a href="{{ url_for('main.data_warehouse') }}" class="btn btn-outline-secondary btn-lg">
+                    <i class="bi bi-x"></i>
+                </a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+</div>
+
+{% if data_by_date %}
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">
+            {% if search_keyword %}搜索结果: "{{ search_keyword }}"{% else %}数据列表{% endif %}
+        </h5>
+        <div>
+            <form method="POST" action="{{ url_for('main.generate_pdf_report') }}" id="generatePdfForm">
+                <button type="submit" class="btn btn-primary" id="generatePdf" disabled>
+                    <i class="bi bi-file-earmark-pdf"></i> 生成PDF报告
+                </button>
+            </form>
+        </div>
+    </div>
+    <div class="card-body">
+        {% for date, items in data_by_date.items() %}
+        <div class="mb-4">
+            <div class="card-header bg-secondary text-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">{{ date }} ({{ items|length }} 条数据)</h6>
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input date-select" data-date="{{ date }}">
+                        <label class="form-check-label">全选此日期</label>
+                    </div>
+                </div>
+            </div>
+            <div class="list-group">
+                {% for item in items %}
+                <div class="list-group-item list-group-item-action" data-url="{{ item.url if item.url else '' }}">
+                    <div class="d-flex">
+                        <div class="flex-shrink-0">
+                            <input 
+                                type="checkbox" 
+                                class="data-checkbox" 
+                                name="selected_data" 
+                                value="{{ item.id }}"
+                                form="generatePdfForm"
+                            >
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <div class="d-flex justify-content-between w-100">
+                                <h5 class="mb-1">{{ item.title }}</h5>
+                                <small class="text-muted">{{ item.keyword }}</small>
+                            </div>
+                            <p class="mb-2 text-muted">{{ item.content[:150] }}{% if item.content|length > 150 %}...{% endif %}</p>
+                            <div class="text-sm">
+                                <span class="text-muted">来源: {{ item.source }}</span>
+                                <span class="mx-2 text-muted">•</span>
+                                <span class="text-muted">{{ item.created_at.strftime('%H:%M:%S') }}</span>
+                                {% if item.url %}
+                                <span class="mx-2 text-muted">•</span>
+                                <a href="{{ item.url }}" target="_blank" class="text-blue-600">查看原文</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="card-footer">
+        <div class="d-flex justify-content-between">
+            <div>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="selectAllData">
+                    <label class="form-check-label" for="selectAllData">全选所有数据</label>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="card">
+    <div class="card-body text-center py-5">
+        <i class="bi bi-database display-1 mb-3 text-muted"></i>
+        <h5 class="text-muted">
+            {% if search_keyword %}未找到匹配"{{ search_keyword }}"的数据{% else %}暂无保存的数据{% endif %}
+        </h5>
+        <a href="{{ url_for('main.index') }}" class="btn btn-primary mt-3">
+            <i class="bi bi-plus"></i> 开始采集数据
+        </a>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // 全选/取消全选所有数据
+    document.getElementById('selectAllData').addEventListener('change', function() {
+        const checkboxes = document.querySelectorAll('.data-checkbox');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = this.checked;
+        });
+        updateGenerateButton();
+    });
+    
+    // 按日期全选/取消全选
+    const dateSelects = document.querySelectorAll('.date-select');
+    dateSelects.forEach(select => {
+        select.addEventListener('change', function() {
+            const date = this.getAttribute('data-date');
+            const checkboxes = this.closest('.mb-4').querySelectorAll('.data-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+            updateGenerateButton();
+        });
+    });
+    
+    // 监听单个复选框变化
+    const checkboxes = document.querySelectorAll('.data-checkbox');
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateGenerateButton);
+    });
+    
+    // 更新生成PDF按钮状态
+    function updateGenerateButton() {
+        const checkboxes = document.querySelectorAll('.data-checkbox');
+        const checkedBoxes = Array.from(checkboxes).filter(checkbox => checkbox.checked);
+        const generateButton = document.getElementById('generatePdf');
+        
+        if (checkedBoxes.length > 0) {
+            generateButton.disabled = false;
+            generateButton.classList.remove('btn-secondary');
+            generateButton.classList.add('btn-primary');
+        } else {
+            generateButton.disabled = true;
+            generateButton.classList.remove('btn-primary');
+            generateButton.classList.add('btn-secondary');
+        }
+    }
+    
+    // 添加点击查看原网页功能
+    const listItems = document.querySelectorAll('.list-group-item');
+    listItems.forEach(item => {
+        item.addEventListener('click', function(e) {
+            // 如果点击的是复选框或其标签，不触发跳转
+            if (e.target.closest('.data-checkbox') || e.target.closest('label')) {
+                return;
+            }
+            
+            const url = this.getAttribute('data-url');
+            if (url && url.trim() !== '') {
+                window.open(url, '_blank');
+            }
+        });
+        
+        // 添加鼠标悬停效果，提示可点击
+        item.addEventListener('mouseenter', function() {
+            const url = this.getAttribute('data-url');
+            if (url && url.trim() !== '') {
+                this.style.cursor = 'pointer';
+                this.classList.add('bg-light');
+            }
+        });
+        
+        item.addEventListener('mouseleave', function() {
+            const url = this.getAttribute('data-url');
+            if (url && url.trim() !== '') {
+                this.style.cursor = 'default';
+                this.classList.remove('bg-light');
+            }
+        });
+    });
+    
+    // 添加滚动动画效果
+    function animateOnScroll() {
+        const elements = document.querySelectorAll('.list-group-item');
+        elements.forEach(element => {
+            const elementTop = element.getBoundingClientRect().top;
+            const elementVisible = 150;
+            if (elementTop < window.innerHeight - elementVisible) {
+                element.classList.add('animate__animated', 'animate__fadeIn');
+            }
+        });
+    }
+    
+    window.addEventListener('scroll', animateOnScroll);
+    animateOnScroll(); // 初始检查
+</script>
+{% endblock %}

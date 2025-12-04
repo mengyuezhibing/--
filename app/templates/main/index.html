@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block page_title %}数据采集分析{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- 左侧控制面板 -->
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">数据采集</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('main.scrape') }}">
+                    <div class="mb-4">
+                        <label for="keyword" class="form-label">关键词/需求</label>
+                        <input 
+                            type="text" 
+                            class="form-control form-control-lg" 
+                            id="keyword" 
+                            name="keyword" 
+                            placeholder="请输入您想要搜索的关键词或需求描述" 
+                            required
+                        >
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-lg w-100">
+                        <i class="bi bi-search"></i> 开始采集
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">使用说明</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        <i class="bi bi-check-circle text-success"></i> 输入关键词，系统将自动爬取相关数据
+                    </li>
+                    <li class="list-group-item">
+                        <i class="bi bi-check-circle text-success"></i> 在结果页面查看并选择需要保存的数据
+                    </li>
+                    <li class="list-group-item">
+                        <i class="bi bi-check-circle text-success"></i> 保存的数据将存储在数据仓库中
+                    </li>
+                    <li class="list-group-item">
+                        <i class="bi bi-check-circle text-success"></i> 从数据仓库选择数据生成PDF报告
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 右侧统计面板 -->
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">系统统计</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-6">
+                        <div class="dashboard-card text-center">
+                            <div class="fs-3">{{ total_data }}</div>
+                            <div class="text-sm">已保存数据</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="dashboard-card text-center bg-gradient-to-r from-info to-blue">
+                            <div class="fs-3">{{ total_reports }}</div>
+                            <div class="text-sm">生成报告</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">最近活动</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_activities %}
+                <ul class="list-unstyled">
+                    {% for activity in recent_activities %}
+                    <li class="mb-3 p-2 border-l-4 border-primary">
+                        <div class="text-sm text-muted">{{ activity.time }}</div>
+                        <div>{{ activity.action }}</div>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <div class="text-center text-muted">暂无活动记录</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // 为输入框添加焦点效果
+    document.getElementById('keyword').addEventListener('focus', function() {
+        this.classList.add('shadow-lg');
+    });
+    
+    document.getElementById('keyword').addEventListener('blur', function() {
+        this.classList.remove('shadow-lg');
+    });
+    
+    // 自动聚焦到输入框
+    window.onload = function() {
+        document.getElementById('keyword').focus();
+    };
+</script>
+{% endblock %}

@@ -1,0 +1,21 @@
+2025-12-02 08:32:30,872 - INFO - === 开始测试Web应用PDF生成功能 ===
+2025-12-02 08:32:31,972 - INFO - 成功导入PDF生成模块
+2025-12-02 08:32:31,972 - INFO - 创建了3条测试数据
+2025-12-02 08:32:31,973 - INFO - 开始测试主PDF生成函数
+2025-12-02 08:32:31,982 - INFO - 主PDF生成成功，文件路径: D:\任务\实训2\app\pdfs\report_20251202_083231.pdf, 文件大小: 1378 字节
+2025-12-02 08:32:31,982 - INFO - 验证通过：文件是有效的PDF格式
+2025-12-02 08:32:31,982 - INFO - 
+开始测试备用PDF生成函数
+2025-12-02 08:32:31,983 - DEBUG - Building prefix dict from the default dictionary ...
+2025-12-02 08:32:31,984 - DEBUG - Loading model from cache C:\Users\ADMINI~1\AppData\Local\Temp\jieba.cache
+2025-12-02 08:32:32,357 - DEBUG - Loading model cost 0.375 seconds.
+2025-12-02 08:32:32,357 - DEBUG - Prefix dict has been built successfully.
+2025-12-02 08:32:32,376 - INFO - 备用PDF生成成功，文件路径: D:\任务\实训2\app\pdfs\report_20251202_083231_fallback.pdf, 文件大小: 757 字节
+2025-12-02 08:32:32,376 - INFO - 验证通过：备用文件是有效的PDF格式
+2025-12-02 08:32:32,376 - INFO - 
+测试完成！
+2025-12-02 08:32:32,377 - INFO - 检查PDF目录中的文件扩展名: D:\任务\实训2\app\pdfs
+2025-12-02 08:32:32,377 - INFO - 验证通过：只关注新生成的PDF文件
+2025-12-02 08:32:32,377 - INFO - 
+=== 测试结果总结 ===
+2025-12-02 08:32:32,377 - INFO - [SUCCESS] 所有测试通过！PDF生成功能已成功修复。

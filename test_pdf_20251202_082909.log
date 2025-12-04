@@ -1,0 +1,28 @@
+2025-12-02 08:29:09,815 - INFO - === 开始测试Web应用PDF生成功能 ===
+2025-12-02 08:29:11,066 - INFO - 成功导入PDF生成模块
+2025-12-02 08:29:11,066 - INFO - 创建了3条测试数据
+2025-12-02 08:29:11,066 - INFO - 开始测试主PDF生成函数
+2025-12-02 08:29:11,080 - INFO - 主PDF生成成功，文件路径: D:\任务\实训2\app\pdfs\report_20251202_082911.pdf, 文件大小: 1378 字节
+2025-12-02 08:29:11,081 - INFO - 验证通过：文件是有效的PDF格式
+2025-12-02 08:29:11,081 - INFO - 
+开始测试备用PDF生成函数
+2025-12-02 08:29:11,081 - DEBUG - Building prefix dict from the default dictionary ...
+2025-12-02 08:29:11,082 - DEBUG - Loading model from cache C:\Users\ADMINI~1\AppData\Local\Temp\jieba.cache
+2025-12-02 08:29:11,461 - DEBUG - Loading model cost 0.380 seconds.
+2025-12-02 08:29:11,462 - DEBUG - Prefix dict has been built successfully.
+2025-12-02 08:29:11,463 - ERROR - 测试过程中发生错误: 'MockDataItem' object has no attribute 'created_at'
+2025-12-02 08:29:11,464 - ERROR - Traceback (most recent call last):
+  File "D:\任务\实训2\test_web_pdf.py", line 72, in test_pdf_generation
+    fallback_path = generate_pdf_fallback("备用PDF报告", mock_data)
+  File "D:\任务\实训2\app\pdf_generator.py", line 645, in generate_pdf_fallback
+    analysis_result = analyzer.perform_full_analysis(data_items)
+  File "D:\任务\实训2\app\data_analyzer.py", line 352, in perform_full_analysis
+    time_distribution = self.analyze_time_distribution(cleaned_data)
+  File "D:\任务\实训2\app\data_analyzer.py", line 148, in analyze_time_distribution
+    if item.created_at:
+AttributeError: 'MockDataItem' object has no attribute 'created_at'
+
+2025-12-02 08:29:11,464 - INFO - 检查PDF目录中的文件扩展名: D:\任务\实训2\app\pdfs
+2025-12-02 08:29:11,465 - INFO - 验证通过：所有文件都是PDF格式
+2025-12-02 08:29:11,465 - INFO - 
+=== 测试结果总结 ===
